@@ -36,6 +36,7 @@ html, body {
 
 /* ===== Background ===== */
 #quote-screen {
+    position: relative;
     background: radial-gradient(ellipse at center, #2d0a0a 0%, #1a0a0a 100%);
 }
 
