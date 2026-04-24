@@ -95,7 +95,12 @@
 
         // Update streak
         const today = new Date().toISOString().split('T')[0];
-        let history = JSON.parse(localStorage.getItem('checkInHistory') || '[]');
+        let history = [];
+        try {
+            history = JSON.parse(localStorage.getItem('checkInHistory') || '[]');
+        } catch (e) {
+            history = [];
+        }
         if (!history.includes(today)) {
             history.push(today);
             localStorage.setItem('checkInHistory', JSON.stringify(history));
@@ -106,9 +111,13 @@
     }
 
     function updateCheckInUI() {
-        checkinBtn.textContent = '已打卡 ✓';
-        checkinBtn.classList.add('checked');
-        shareOptions.classList.remove('hidden');
+        if (checkinBtn) {
+            checkinBtn.textContent = '已打卡 ✓';
+            checkinBtn.classList.add('checked');
+        }
+        if (shareOptions) {
+            shareOptions.classList.remove('hidden');
+        }
     }
 
     // ===== Events =====
@@ -120,46 +129,55 @@
 
         // Touch swipe down to show analysis
         let touchStartY = 0;
-        quoteScreen.addEventListener('touchstart', (e) => {
-            touchStartY = e.touches[0].clientY;
-        }, { passive: true });
+        if (quoteScreen) {
+            quoteScreen.addEventListener('touchstart', (e) => {
+                touchStartY = e.touches[0].clientY;
+            }, { passive: true });
 
-        quoteScreen.addEventListener('touchend', (e) => {
-            const touchEndY = e.changedTouches[0].clientY;
-            if (touchStartY - touchEndY > 50) {
-                showAnalysis();
-            }
-        }, { passive: true });
+            quoteScreen.addEventListener('touchend', (e) => {
+                const touchEndY = e.changedTouches[0].clientY;
+                if (touchStartY - touchEndY > 50) {
+                    showAnalysis();
+                }
+            }, { passive: true });
 
-        // Mouse wheel to show analysis
-        quoteScreen.addEventListener('wheel', (e) => {
-            if (e.deltaY > 30) {
-                showAnalysis();
-            }
-        }, { passive: true });
+            // Mouse wheel to show analysis
+            quoteScreen.addEventListener('wheel', (e) => {
+                if (e.deltaY > 30) {
+                    showAnalysis();
+                }
+            }, { passive: true });
+        }
 
         // Check-in button
-        checkinBtn.addEventListener('click', doCheckIn);
+        if (checkinBtn) {
+            checkinBtn.addEventListener('click', doCheckIn);
+        }
 
         // Share buttons
-        document.getElementById('share-image-btn').addEventListener('click', () => {
-            if (typeof generateShareCard === 'function' && currentQuote) {
-                generateShareCard(currentQuote);
-            }
-        });
-
-        document.getElementById('copy-text-btn').addEventListener('click', () => {
-            if (!currentQuote) return;
-            const text = `${currentQuote.text}\n\n—— ${currentQuote.source}\n\n毛主席语录 · 每日一句`;
-            navigator.clipboard.writeText(text).then(() => {
-                const btn = document.getElementById('copy-text-btn');
-                const original = btn.textContent;
-                btn.textContent = '已复制';
-                setTimeout(() => { btn.textContent = original; }, 2000);
-            }).catch(() => {
-                alert('复制失败，请手动复制');
+        const shareImageBtn = document.getElementById('share-image-btn');
+        if (shareImageBtn) {
+            shareImageBtn.addEventListener('click', () => {
+                if (typeof generateShareCard === 'function' && currentQuote) {
+                    generateShareCard(currentQuote);
+                }
             });
-        });
+        }
+
+        const copyTextBtn = document.getElementById('copy-text-btn');
+        if (copyTextBtn) {
+            copyTextBtn.addEventListener('click', () => {
+                if (!currentQuote) return;
+                const text = `${currentQuote.text}\n\n—— ${currentQuote.source}\n\n毛主席语录 · 每日一句`;
+                navigator.clipboard.writeText(text).then(() => {
+                    const original = copyTextBtn.textContent;
+                    copyTextBtn.textContent = '已复制';
+                    setTimeout(() => { copyTextBtn.textContent = original; }, 2000);
+                }).catch(() => {
+                    alert('复制失败，请手动复制');
+                });
+            });
+        }
     }
 
     // ===== Start =====
