@@ -19,12 +19,124 @@
     let currentQuote = null;
     let isCheckedIn = false;
 
+    // ===== Streak Data Layer =====
+
+    const STORAGE_KEYS = {
+        history: 'checkin_history',
+        current: 'streak_current',
+        best: 'streak_best',
+        soundMuted: 'sound_muted'
+    };
+
+    function migrateV1Data() {
+        const oldHistory = localStorage.getItem('checkInHistory');
+        const newHistory = localStorage.getItem(STORAGE_KEYS.history);
+        if (oldHistory && !newHistory) {
+            try {
+                const parsed = JSON.parse(oldHistory);
+                localStorage.setItem(STORAGE_KEYS.history, JSON.stringify(parsed));
+            } catch (e) {
+                // ignore
+            }
+        }
+    }
+
+    function getCheckInHistory() {
+        try {
+            return JSON.parse(localStorage.getItem(STORAGE_KEYS.history) || '[]');
+        } catch (e) {
+            return [];
+        }
+    }
+
+    function saveCheckInHistory(history) {
+        localStorage.setItem(STORAGE_KEYS.history, JSON.stringify(history));
+    }
+
+    function getStreakState() {
+        migrateV1Data();
+        const history = getCheckInHistory();
+        const current = parseInt(localStorage.getItem(STORAGE_KEYS.current) || '0', 10);
+        const best = parseInt(localStorage.getItem(STORAGE_KEYS.best) || '0', 10);
+        return { history, current, best };
+    }
+
+    function calculateStreak(history, todayStr) {
+        if (!history || history.length === 0) return 0;
+        const set = new Set(history);
+        let current = 0;
+        let checkDate = new Date(todayStr);
+        while (true) {
+            const d = checkDate.toISOString().split('T')[0];
+            if (set.has(d)) {
+                current++;
+                checkDate.setDate(checkDate.getDate() - 1);
+            } else {
+                break;
+            }
+        }
+        return current;
+    }
+
+    function calculateBestStreak(history, currentStreak) {
+        if (!history || history.length === 0) return 0;
+        const sorted = Array.from(new Set(history)).sort();
+        let maxStreak = 0;
+        let tempStreak = 1;
+        for (let i = 1; i < sorted.length; i++) {
+            const prev = new Date(sorted[i - 1]);
+            const curr = new Date(sorted[i]);
+            const diff = (curr - prev) / (1000 * 60 * 60 * 24);
+            if (diff === 1) {
+                tempStreak++;
+            } else {
+                maxStreak = Math.max(maxStreak, tempStreak);
+                tempStreak = 1;
+            }
+        }
+        maxStreak = Math.max(maxStreak, tempStreak);
+        return Math.max(maxStreak, currentStreak);
+    }
+
+    function isCheckedInToday() {
+        const today = new Date().toISOString().split('T')[0];
+        const history = getCheckInHistory();
+        return history.includes(today);
+    }
+
+    function updateStreakForCheckIn() {
+        const today = new Date().toISOString().split('T')[0];
+        let history = getCheckInHistory();
+
+        if (history.includes(today)) {
+            return null;
+        }
+
+        history.push(today);
+        saveCheckInHistory(history);
+
+        const current = calculateStreak(history, today);
+        const best = calculateBestStreak(history, current);
+
+        localStorage.setItem(STORAGE_KEYS.current, String(current));
+        localStorage.setItem(STORAGE_KEYS.best, String(best));
+
+        return { current, best };
+    }
+
+    // Stubs for functions defined in later tasks
+    function updateStreakUI() {}
+    function triggerParticleBurst() {}
+    function initStreakUI() {}
+
     // ===== Initialization =====
     function init() {
+        migrateV1Data();
         currentQuote = getTodayQuote();
         renderQuote();
         createParticles();
         checkCheckInStatus();
+        initStreakUI();
         bindEvents();
     }
 
@@ -73,15 +185,8 @@
     }
 
     // ===== Check-in =====
-    function getCheckInKey() {
-        const today = new Date();
-        return `checkin_${today.getFullYear()}_${today.getMonth() + 1}_${today.getDate()}`;
-    }
-
     function checkCheckInStatus() {
-        const key = getCheckInKey();
-        const checked = localStorage.getItem(key) === 'true';
-        if (checked) {
+        if (isCheckedInToday()) {
             isCheckedIn = true;
             updateCheckInUI();
         }
@@ -90,24 +195,17 @@
     function doCheckIn() {
         if (isCheckedIn) return;
 
-        const key = getCheckInKey();
-        localStorage.setItem(key, 'true');
-
-        // Update streak
-        const today = new Date().toISOString().split('T')[0];
-        let history = [];
-        try {
-            history = JSON.parse(localStorage.getItem('checkInHistory') || '[]');
-        } catch (e) {
-            history = [];
-        }
-        if (!history.includes(today)) {
-            history.push(today);
-            localStorage.setItem('checkInHistory', JSON.stringify(history));
-        }
+        const result = updateStreakForCheckIn();
+        if (!result) return;
 
         isCheckedIn = true;
         updateCheckInUI();
+        updateStreakUI(result.current, result.best);
+
+        if (typeof playCheckinSound === 'function') {
+            playCheckinSound();
+        }
+        triggerParticleBurst();
     }
 
     function updateCheckInUI() {
