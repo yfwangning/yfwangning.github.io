@@ -125,9 +125,72 @@
     }
 
     // Stubs for functions defined in later tasks
-    function updateStreakUI() {}
     function triggerParticleBurst() {}
-    function initStreakUI() {}
+
+    function updateStreakUI(current, best) {
+        const streakText = document.getElementById('streak-text');
+        const streakIcon = document.querySelector('.streak-icon');
+        if (!streakText) return;
+
+        if (current === 0 && best === 0) {
+            streakText.textContent = '开始学习 · 每日一句，持之以恒';
+        } else {
+            streakText.textContent = `连续学习 ${current} 天 · 最高纪录 ${best} 天`;
+        }
+
+        if (streakIcon) {
+            if (current >= 30) {
+                streakIcon.style.filter = 'hue-rotate(-20deg) saturate(1.5)';
+            } else if (current >= 14) {
+                streakIcon.style.filter = 'hue-rotate(-10deg) saturate(1.3)';
+            } else if (current >= 7) {
+                streakIcon.style.filter = 'saturate(1.2)';
+            }
+        }
+    }
+
+    function animateStreakUpdate() {
+        const streakText = document.getElementById('streak-text');
+        const streakIcon = document.querySelector('.streak-icon');
+        if (streakText) {
+            streakText.style.transition = 'transform 0.2s ease, color 0.2s ease';
+            streakText.style.transform = 'scale(1.3)';
+            streakText.style.color = '#f5e6c8';
+            setTimeout(() => {
+                streakText.style.transform = 'scale(1)';
+                streakText.style.color = '#a08060';
+            }, 200);
+        }
+        if (streakIcon) {
+            streakIcon.classList.add('pop');
+            setTimeout(() => streakIcon.classList.remove('pop'), 300);
+        }
+    }
+
+    function updateMuteIcon() {
+        const muteBtn = document.getElementById('mute-btn');
+        if (!muteBtn) return;
+        const muted = (function() {
+            try { return localStorage.getItem('sound_muted') === 'true'; }
+            catch (e) { return false; }
+        })();
+        muteBtn.textContent = muted ? '🔇' : '🔊';
+    }
+
+    function toggleMute() {
+        const muted = (function() {
+            try { return localStorage.getItem('sound_muted') === 'true'; }
+            catch (e) { return false; }
+        })();
+        localStorage.setItem('sound_muted', String(!muted));
+        updateMuteIcon();
+    }
+
+    function initStreakUI() {
+        const state = getStreakState();
+        updateStreakUI(state.current, state.best);
+        updateMuteIcon();
+    }
 
     // ===== Initialization =====
     function init() {
@@ -201,6 +264,7 @@
         isCheckedIn = true;
         updateCheckInUI();
         updateStreakUI(result.current, result.best);
+        animateStreakUpdate();
 
         if (typeof playCheckinSound === 'function') {
             playCheckinSound();
@@ -275,6 +339,12 @@
                     alert('复制失败，请手动复制');
                 });
             });
+        }
+
+        // Mute toggle
+        const muteBtn = document.getElementById('mute-btn');
+        if (muteBtn) {
+            muteBtn.addEventListener('click', toggleMute);
         }
     }
 
