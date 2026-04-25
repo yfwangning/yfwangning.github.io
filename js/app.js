@@ -19,6 +19,12 @@
     let currentQuote = null;
     let isCheckedIn = false;
 
+    // ===== Calendar State =====
+    let calendarCurrentMonth = new Date().getMonth();
+    let calendarCurrentYear = new Date().getFullYear();
+    let calendarSelectedDate = null;
+    let isAnalysisShown = false;
+
     // ===== Streak Data Layer =====
 
     const STORAGE_KEYS = {
@@ -192,6 +198,140 @@
         updateMuteIcon();
     }
 
+    // ===== Calendar Logic =====
+
+    function openCalendar() {
+        const overlay = document.getElementById('calendar-overlay');
+        if (!overlay) return;
+        calendarCurrentMonth = new Date().getMonth();
+        calendarCurrentYear = new Date().getFullYear();
+        renderCalendar();
+        overlay.classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeCalendar() {
+        const overlay = document.getElementById('calendar-overlay');
+        if (!overlay) return;
+        overlay.classList.remove('active');
+        document.body.style.overflow = '';
+    }
+
+    function renderCalendar() {
+        const grid = document.getElementById('calendar-grid');
+        const monthLabel = document.getElementById('calendar-month-label');
+        if (!grid || !monthLabel) return;
+
+        monthLabel.textContent = `${calendarCurrentYear}年${calendarCurrentMonth + 1}月`;
+        grid.innerHTML = '';
+
+        const year = calendarCurrentYear;
+        const month = calendarCurrentMonth;
+        const firstDay = new Date(year, month, 1).getDay();
+        const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+        const today = new Date();
+        const todayStr = today.toISOString().split('T')[0];
+        const checkInSet = new Set(getCheckInHistory());
+
+        // 空白填充
+        for (let i = 0; i < firstDay; i++) {
+            const cell = document.createElement('div');
+            cell.className = 'calendar-cell disabled';
+            grid.appendChild(cell);
+        }
+
+        // 日期格子
+        for (let d = 1; d <= daysInMonth; d++) {
+            const cell = document.createElement('div');
+            const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+            const dateObj = new Date(year, month, d);
+
+            let className = 'calendar-cell';
+            if (dateStr === todayStr) {
+                className += ' today';
+            }
+            if (dateObj > today) {
+                className += ' future';
+            }
+            if (checkInSet.has(dateStr)) {
+                className += ' checked';
+            }
+            if (calendarSelectedDate === dateStr) {
+                className += ' selected';
+            }
+
+            cell.className = className;
+            cell.textContent = d;
+
+            if (dateObj <= today) {
+                cell.addEventListener('click', () => selectCalendarDate(dateStr));
+            }
+
+            grid.appendChild(cell);
+        }
+    }
+
+    function selectCalendarDate(dateStr) {
+        calendarSelectedDate = dateStr;
+        renderCalendar();
+
+        const quote = getQuoteByDate(dateStr.slice(5));
+        const previewText = document.getElementById('calendar-quote-text');
+        const previewSource = document.getElementById('calendar-quote-source');
+        if (previewText && quote) {
+            previewText.textContent = quote.text;
+        }
+        if (previewSource && quote) {
+            previewSource.textContent = quote.source;
+        }
+    }
+
+    function goToQuoteDate(dateStr) {
+        const mmdd = dateStr.slice(5);
+        const quote = getQuoteByDate(mmdd);
+        if (!quote) return;
+
+        currentQuote = quote;
+        renderQuote();
+        closeCalendar();
+
+        const quoteScreenEl = document.getElementById('quote-screen');
+        if (quoteScreenEl) {
+            const existingTag = quoteScreenEl.querySelector('.history-tag');
+            if (existingTag) existingTag.remove();
+            const tag = document.createElement('div');
+            tag.className = 'history-tag';
+            tag.textContent = `${dateStr} 的历史语录`;
+            tag.style.cssText = 'position:absolute;top:20px;left:50%;transform:translateX(-50%);font-size:12px;color:#a08060;opacity:0.8;z-index:10;';
+            quoteScreenEl.appendChild(tag);
+        }
+
+        showQuote();
+    }
+
+    function prevMonth() {
+        calendarCurrentMonth--;
+        if (calendarCurrentMonth < 0) {
+            calendarCurrentMonth = 11;
+            calendarCurrentYear--;
+        }
+        renderCalendar();
+    }
+
+    function nextMonth() {
+        calendarCurrentMonth++;
+        if (calendarCurrentMonth > 11) {
+            calendarCurrentMonth = 0;
+            calendarCurrentYear++;
+        }
+        renderCalendar();
+    }
+
+    function triggerAnalysisAnimations() {
+        // Stub: will be implemented in Task 6
+    }
+
     // ===== Initialization =====
     function init() {
         migrateV1Data();
@@ -237,12 +377,19 @@
 
     // ===== View Transition =====
     function showAnalysis() {
+        if (isAnalysisShown) return;
+        isAnalysisShown = true;
         quoteScreen.classList.remove('active');
         analysisScreen.classList.add('active');
         window.scrollTo(0, 0);
+        if (typeof playFlipSound === 'function') {
+            playFlipSound();
+        }
+        triggerAnalysisAnimations();
     }
 
     function showQuote() {
+        isAnalysisShown = false;
         analysisScreen.classList.remove('active');
         quoteScreen.classList.add('active');
     }
@@ -345,6 +492,55 @@
         const muteBtn = document.getElementById('mute-btn');
         if (muteBtn) {
             muteBtn.addEventListener('click', toggleMute);
+        }
+
+        // Calendar
+        const historyBtn = document.getElementById('history-btn');
+        if (historyBtn) {
+            historyBtn.addEventListener('click', openCalendar);
+        }
+
+        const calendarClose = document.getElementById('calendar-close');
+        const calendarBackdrop = document.querySelector('.calendar-backdrop');
+        if (calendarClose) {
+            calendarClose.addEventListener('click', closeCalendar);
+        }
+        if (calendarBackdrop) {
+            calendarBackdrop.addEventListener('click', closeCalendar);
+        }
+
+        const calendarPrev = document.getElementById('calendar-prev');
+        const calendarNext = document.getElementById('calendar-next');
+        if (calendarPrev) {
+            calendarPrev.addEventListener('click', prevMonth);
+        }
+        if (calendarNext) {
+            calendarNext.addEventListener('click', nextMonth);
+        }
+
+        const quotePreview = document.getElementById('calendar-quote-preview');
+        if (quotePreview) {
+            quotePreview.addEventListener('click', () => {
+                if (calendarSelectedDate) {
+                    goToQuoteDate(calendarSelectedDate);
+                }
+            });
+        }
+
+        // Calendar swipe down to close
+        let calTouchStartY = 0;
+        const calPanel = document.querySelector('.calendar-panel');
+        if (calPanel) {
+            calPanel.addEventListener('touchstart', (e) => {
+                calTouchStartY = e.touches[0].clientY;
+            }, { passive: true });
+
+            calPanel.addEventListener('touchend', (e) => {
+                const calTouchEndY = e.changedTouches[0].clientY;
+                if (calTouchEndY - calTouchStartY > 80) {
+                    closeCalendar();
+                }
+            }, { passive: true });
         }
     }
 
