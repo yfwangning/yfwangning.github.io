@@ -65,6 +65,24 @@ python3 -m http.server 8080
 - 测试：data 9/9 通过，streak 6/6 通过
 - 文件：index.html, css/main.css, js/app.js, js/sound.js, js/data.js, js/share.js, tests/*.test.js
 
+## 2026-04-25（续）
+
+### 今日完成 — v3 毛主席几何剪影
+- [x] 设计文档 — 几何抽象风，首页+分享卡片，纯代码实现
+  - 文件：`docs/superpowers/specs/2026-04-25-mao-silhouette-design.md`
+- [x] 实现计划 — 3 个任务
+  - 文件：`docs/superpowers/plans/2026-04-25-mao-silhouette.md`
+- [x] Task 1: 首页剪影 — SVG 几何图形，左下角，品牌红 10% 透明度，5s 浮动动画，响应式
+- [x] Task 2: 分享卡片剪影 — Canvas 2D Path API，右侧大面积水印，12% 透明度，杂志封面感
+- [x] Task 3: 集成验证 — 回归测试 15/15 通过，浏览器端到端验证通过（首页+分享卡片截图确认）
+
+### 项目状态
+- 当前版本：v3（毛主席几何剪影）
+- 分支：feat/silhouette
+- 测试：data 9/9 通过，streak 6/6 通过
+- 文件：index.html, css/main.css, js/app.js, js/sound.js, js/data.js, js/share.js, tests/*.test.js
+
 ### 下一步可选
+- [ ] 合并到 master
 - [ ] 部署上线（GitHub Pages / Vercel）
 - [ ] 语录数据审查（用户抽查和修正个别出处）
