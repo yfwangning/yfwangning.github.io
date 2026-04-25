@@ -131,7 +131,21 @@
     }
 
     // Stubs for functions defined in later tasks
-    function triggerParticleBurst() {}
+    function triggerParticleBurst() {
+        const particles = document.querySelectorAll('.particle');
+        particles.forEach(p => {
+            p.classList.add('burst');
+            const currentDuration = parseFloat(p.style.animationDuration) || 15;
+            p.style.animationDuration = (currentDuration / 3) + 's';
+        });
+        setTimeout(() => {
+            particles.forEach(p => {
+                p.classList.remove('burst');
+                const currentDuration = parseFloat(p.style.animationDuration) || 5;
+                p.style.animationDuration = (currentDuration * 3) + 's';
+            });
+        }, 500);
+    }
 
     function updateStreakUI(current, best) {
         const streakText = document.getElementById('streak-text');
@@ -329,7 +343,14 @@
     }
 
     function triggerAnalysisAnimations() {
-        // Stub: will be implemented in Task 6
+        const sections = document.querySelectorAll('.analysis-sections .section');
+        sections.forEach((section, index) => {
+            section.classList.remove('visible');
+            void section.offsetWidth;
+            setTimeout(() => {
+                section.classList.add('visible');
+            }, index * 150);
+        });
     }
 
     // ===== Initialization =====
@@ -367,7 +388,7 @@
             const p = document.createElement('div');
             p.className = 'particle';
             p.style.left = Math.random() * 100 + '%';
-            p.style.animationDuration = (10 + Math.random() * 20) + 's';
+            p.style.animationDuration = (10 + Math.random() * 15) + 's';
             p.style.animationDelay = (Math.random() * 10) + 's';
             p.style.width = (2 + Math.random() * 3) + 'px';
             p.style.height = p.style.width;
