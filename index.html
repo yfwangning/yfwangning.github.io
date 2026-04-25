@@ -12,6 +12,19 @@
     <!-- 第一层：语录屏 -->
     <div id="quote-screen" class="screen active">
         <div class="particles" id="particles"></div>
+        <!-- 毛主席几何剪影 -->
+        <div class="silhouette" aria-hidden="true">
+            <svg viewBox="0 0 120 160" preserveAspectRatio="xMidYMax meet">
+                <path class="silhouette-path" d="M60 10
+                    C75 10, 85 25, 85 45
+                    C85 55, 80 65, 75 70
+                    L80 90 L95 110 L90 160 L30 160 L25 110 L40 90 L45 70
+                    C40 65, 35 55, 35 45
+                    C35 25, 45 10, 60 10Z" />
+                <circle class="silhouette-cutout" cx="60" cy="35" r="18" />
+                <path class="silhouette-cutout" d="M42 38 Q60 55 78 38 L78 45 Q60 62 42 45Z" />
+            </svg>
+        </div>
         <div class="quote-container">
             <p id="quote-text" class="quote-text">加载中...</p>
             <p id="quote-source" class="quote-source"></p>
