@@ -78,11 +78,11 @@ python3 -m http.server 8080
 
 ### 项目状态
 - 当前版本：v3（毛主席几何剪影）
-- 分支：feat/silhouette
+- 分支：master
 - 测试：data 9/9 通过，streak 6/6 通过
 - 文件：index.html, css/main.css, js/app.js, js/sound.js, js/data.js, js/share.js, tests/*.test.js
 
 ### 下一步可选
-- [ ] 合并到 master
+- [x] 合并到 master
 - [ ] 部署上线（GitHub Pages / Vercel）
 - [ ] 语录数据审查（用户抽查和修正个别出处）
