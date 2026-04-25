@@ -396,13 +396,35 @@
         }
     }
 
+    // ===== Smooth Scroll =====
+    function easeOutCubic(t) {
+        return 1 - Math.pow(1 - t, 3);
+    }
+
+    function smoothScrollTo(targetY, duration) {
+        const startY = window.scrollY || window.pageYOffset;
+        const diff = targetY - startY;
+        const startTime = performance.now();
+
+        function step(currentTime) {
+            const elapsed = currentTime - startTime;
+            const progress = Math.min(elapsed / duration, 1);
+            const eased = easeOutCubic(progress);
+            window.scrollTo(0, startY + diff * eased);
+            if (progress < 1) {
+                requestAnimationFrame(step);
+            }
+        }
+        requestAnimationFrame(step);
+    }
+
     // ===== View Transition =====
     function showAnalysis() {
         if (isAnalysisShown) return;
         isAnalysisShown = true;
         quoteScreen.classList.remove('active');
         analysisScreen.classList.add('active');
-        window.scrollTo(0, 0);
+        smoothScrollTo(0, 800);
         if (typeof playFlipSound === 'function') {
             playFlipSound();
         }
