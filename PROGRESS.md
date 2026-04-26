@@ -82,7 +82,30 @@ python3 -m http.server 8080
 - 测试：data 9/9 通过，streak 6/6 通过
 - 文件：index.html, css/main.css, js/app.js, js/sound.js, js/data.js, js/share.js, tests/*.test.js
 
+---
+
+## 2026-04-26
+
+### 今日完成 — v3 剪影素材替换
+- [x] 素材预处理 — Python Pillow 提取透明背景，黑色剪影转品牌红（#c41e3a）
+  - 文件：`assets/mao-silhouette.png`
+- [x] 首页剪影替换 — SVG 几何图形 → `<img>` 引用真实人物剪影
+  - 位置：右下角，`width: 30%`，品牌红 8% 透明度，移除浮动动画
+  - 响应式移动端：`width: 25%`
+- [x] 分享卡片剪影替换 — Canvas Path API → `ctx.drawImage()`
+  - 位置：画布右侧大面积水印，`globalAlpha: 0.12`
+  - 预加载图片对象，加载失败自动跳过
+- [x] 分享卡片预览模态框
+  - 点击"生成分享卡片"后弹出全屏预览，而非直接下载
+  - 模态框：居中卡片预览 + "保存到相册"按钮
+  - 点击背景遮罩或 X 关闭，不触发下载
+
+### 项目状态
+- 当前版本：v3.1（真实人物剪影 + 分享预览模态框）
+- 分支：master
+- 测试：data 9/9 通过，streak 6/6 通过
+- 文件：index.html, css/main.css, js/app.js, js/share.js, js/data.js, js/sound.js, tests/*.test.js
+
 ### 下一步可选
-- [x] 合并到 master
 - [ ] 部署上线（GitHub Pages / Vercel）
 - [ ] 语录数据审查（用户抽查和修正个别出处）
