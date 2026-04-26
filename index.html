@@ -70,6 +70,18 @@
     <!-- 分享卡片 Canvas（隐藏） -->
     <canvas id="share-canvas" width="1080" height="1920" style="display:none;"></canvas>
 
+    <!-- 分享卡片预览 -->
+    <div id="share-preview-overlay" class="share-preview-overlay">
+        <div class="share-preview-backdrop"></div>
+        <div class="share-preview-panel">
+            <button id="share-preview-close" class="share-preview-close">×</button>
+            <div class="share-preview-image">
+                <img id="share-preview-img" src="" alt="分享卡片预览">
+            </div>
+            <button id="share-download-btn" class="share-download-btn">保存到相册</button>
+        </div>
+    </div>
+
     <!-- 日历覆盖层 -->
     <div id="calendar-overlay" class="calendar-overlay">
         <div class="calendar-backdrop"></div>

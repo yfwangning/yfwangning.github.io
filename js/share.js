@@ -2,22 +2,24 @@
 const SILHOUETTE_IMG = new Image();
 SILHOUETTE_IMG.src = 'assets/mao-silhouette.png';
 
+let lastShareCardData = null;
+
 /**
- * 生成分享卡片并触发下载
+ * 渲染分享卡片到 Canvas
  * @param {Object} quote - 语录对象
+ * @returns {HTMLCanvasElement|null}
  */
-function generateShareCard(quote) {
-    if (!quote) return;
+function renderShareCard(quote) {
+    if (!quote) return null;
 
     const canvas = document.getElementById('share-canvas');
-    if (!canvas) return;
+    if (!canvas) return null;
 
     const ctx = canvas.getContext('2d');
     const width = canvas.width;
     const height = canvas.height;
 
     // ===== Background =====
-    // 深红渐变
     const gradient = ctx.createRadialGradient(
         width / 2, height / 2, 0,
         width / 2, height / 2, height
@@ -51,7 +53,6 @@ function generateShareCard(quote) {
     ctx.fillStyle = '#f5e6c8';
     ctx.textAlign = 'center';
 
-    // 自动换行
     const maxWidth = width * 0.75;
     const fontSize = 72;
     ctx.font = `bold ${fontSize}px "Noto Serif SC", "Source Han Serif CN", SimSun, serif`;
@@ -82,8 +83,56 @@ function generateShareCard(quote) {
     ctx.font = '24px -apple-system, BlinkMacSystemFont, sans-serif';
     ctx.fillText('毛主席语录 · 每日一句', width / 2, height * 0.88);
 
-    // ===== Download =====
-    downloadCanvas(canvas, `毛主席语录_${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}-${String(today.getDate()).padStart(2,'0')}.png`);
+    return canvas;
+}
+
+/**
+ * 显示分享卡片预览模态框
+ * @param {Object} quote - 语录对象
+ */
+function showSharePreview(quote) {
+    const canvas = renderShareCard(quote);
+    if (!canvas) return;
+
+    const dataUrl = canvas.toDataURL('image/png');
+    lastShareCardData = {
+        dataUrl: dataUrl,
+        filename: `毛主席语录_${new Date().getFullYear()}-${String(new Date().getMonth()+1).padStart(2,'0')}-${String(new Date().getDate()).padStart(2,'0')}.png`
+    };
+
+    const img = document.getElementById('share-preview-img');
+    if (img) {
+        img.src = dataUrl;
+    }
+
+    const overlay = document.getElementById('share-preview-overlay');
+    if (overlay) {
+        overlay.classList.add('active');
+    }
+}
+
+/**
+ * 下载分享卡片
+ */
+function downloadShareCard() {
+    if (!lastShareCardData) return;
+
+    const link = document.createElement('a');
+    link.download = lastShareCardData.filename;
+    link.href = lastShareCardData.dataUrl;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+}
+
+/**
+ * 关闭分享卡片预览
+ */
+function closeSharePreview() {
+    const overlay = document.getElementById('share-preview-overlay');
+    if (overlay) {
+        overlay.classList.remove('active');
+    }
 }
 
 /**
@@ -122,5 +171,5 @@ function downloadCanvas(canvas, filename) {
 
 // 导出
 if (typeof module !== 'undefined' && module.exports) {
-    module.exports = { generateShareCard, wrapText, downloadCanvas };
+    module.exports = { renderShareCard, showSharePreview, downloadShareCard, closeSharePreview, wrapText, downloadCanvas };
 }

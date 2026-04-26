@@ -362,6 +362,104 @@ html, body {
     opacity: 1;
 }
 
+/* ===== Share Preview Overlay ===== */
+.share-preview-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 200;
+    display: none;
+    align-items: center;
+    justify-content: center;
+}
+
+.share-preview-overlay.active {
+    display: flex;
+}
+
+.share-preview-backdrop {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.share-preview-overlay.active .share-preview-backdrop {
+    opacity: 1;
+}
+
+.share-preview-panel {
+    position: relative;
+    z-index: 201;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.5rem;
+    padding: 1.5rem;
+    transform: scale(0.9);
+    opacity: 0;
+    transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.share-preview-overlay.active .share-preview-panel {
+    transform: scale(1);
+    opacity: 1;
+}
+
+.share-preview-close {
+    position: absolute;
+    top: -2.5rem;
+    right: 0;
+    background: transparent;
+    border: none;
+    color: #a08060;
+    font-size: 28px;
+    cursor: pointer;
+    line-height: 1;
+    padding: 0.5rem;
+}
+
+.share-preview-image {
+    max-height: 60vh;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+}
+
+.share-preview-image img {
+    height: 60vh;
+    width: auto;
+    display: block;
+}
+
+.share-download-btn {
+    background: #c41e3a;
+    color: #fff;
+    border: none;
+    padding: 0.9rem 2.5rem;
+    font-size: 1rem;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    letter-spacing: 0.1em;
+    font-family: inherit;
+}
+
+.share-download-btn:hover {
+    background: #d4283f;
+    transform: scale(1.02);
+}
+
+.share-download-btn:active {
+    transform: scale(0.96);
+}
+
 /* ===== Calendar Overlay ===== */
 .calendar-overlay {
     position: fixed;

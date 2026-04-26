@@ -510,8 +510,28 @@
         const shareImageBtn = document.getElementById('share-image-btn');
         if (shareImageBtn) {
             shareImageBtn.addEventListener('click', () => {
-                if (typeof generateShareCard === 'function' && currentQuote) {
-                    generateShareCard(currentQuote);
+                if (typeof showSharePreview === 'function' && currentQuote) {
+                    showSharePreview(currentQuote);
+                }
+            });
+        }
+
+        // Share preview controls
+        const sharePreviewClose = document.getElementById('share-preview-close');
+        if (sharePreviewClose) {
+            sharePreviewClose.addEventListener('click', closeSharePreview);
+        }
+
+        const sharePreviewBackdrop = document.querySelector('.share-preview-backdrop');
+        if (sharePreviewBackdrop) {
+            sharePreviewBackdrop.addEventListener('click', closeSharePreview);
+        }
+
+        const shareDownloadBtn = document.getElementById('share-download-btn');
+        if (shareDownloadBtn) {
+            shareDownloadBtn.addEventListener('click', () => {
+                if (typeof downloadShareCard === 'function') {
+                    downloadShareCard();
                 }
             });
         }
