@@ -1,3 +1,7 @@
+// Pre-load silhouette for share card
+const SILHOUETTE_IMG = new Image();
+SILHOUETTE_IMG.src = 'assets/mao-silhouette.png';
+
 /**
  * 生成分享卡片并触发下载
  * @param {Object} quote - 语录对象
@@ -24,42 +28,16 @@ function generateShareCard(quote) {
     ctx.fillRect(0, 0, width, height);
 
     // ===== Silhouette =====
-    ctx.save();
-    ctx.globalAlpha = 0.12;
-    ctx.fillStyle = '#c41e3a';
-    const sX = width * 0.55;
-    const sY = height * 0.15;
-    const s = width * 0.0045;
-
-    // 头部轮廓
-    ctx.beginPath();
-    ctx.moveTo(sX + 60*s, sY + 10*s);
-    ctx.bezierCurveTo(sX + 75*s, sY + 10*s, sX + 85*s, sY + 25*s, sX + 85*s, sY + 45*s);
-    ctx.bezierCurveTo(sX + 85*s, sY + 55*s, sX + 80*s, sY + 65*s, sX + 75*s, sY + 70*s);
-    ctx.lineTo(sX + 80*s, sY + 90*s);
-    ctx.lineTo(sX + 95*s, sY + 110*s);
-    ctx.lineTo(sX + 90*s, sY + 160*s);
-    ctx.lineTo(sX + 30*s, sY + 160*s);
-    ctx.lineTo(sX + 25*s, sY + 110*s);
-    ctx.lineTo(sX + 40*s, sY + 90*s);
-    ctx.lineTo(sX + 45*s, sY + 70*s);
-    ctx.bezierCurveTo(sX + 40*s, sY + 65*s, sX + 35*s, sY + 55*s, sX + 35*s, sY + 45*s);
-    ctx.bezierCurveTo(sX + 35*s, sY + 25*s, sX + 45*s, sY + 10*s, sX + 60*s, sY + 10*s);
-    ctx.fill();
-
-    // 面部负形
-    ctx.globalAlpha = 1;
-    ctx.fillStyle = '#1a0a0a';
-    ctx.beginPath();
-    ctx.arc(sX + 60*s, sY + 35*s, 18*s, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.beginPath();
-    ctx.moveTo(sX + 42*s, sY + 38*s);
-    ctx.quadraticCurveTo(sX + 60*s, sY + 55*s, sX + 78*s, sY + 38*s);
-    ctx.lineTo(sX + 78*s, sY + 45*s);
-    ctx.quadraticCurveTo(sX + 60*s, sY + 62*s, sX + 42*s, sY + 45*s);
-    ctx.fill();
-    ctx.restore();
+    if (SILHOUETTE_IMG.complete && SILHOUETTE_IMG.naturalWidth > 0) {
+        ctx.save();
+        ctx.globalAlpha = 0.12;
+        const sHeight = height * 0.7;
+        const sWidth = sHeight * (SILHOUETTE_IMG.width / SILHOUETTE_IMG.height);
+        const sX = width * 0.55;
+        const sY = height * 0.15;
+        ctx.drawImage(SILHOUETTE_IMG, sX, sY, sWidth, sHeight);
+        ctx.restore();
+    }
 
     // ===== Decorative Line =====
     ctx.strokeStyle = 'rgba(160, 128, 96, 0.3)';
