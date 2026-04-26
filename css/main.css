@@ -688,7 +688,7 @@ html, body {
 .silhouette {
     position: absolute;
     bottom: 0;
-    left: 0;
+    right: 0;
     width: 30%;
     z-index: 3;
     pointer-events: none;
