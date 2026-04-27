@@ -106,6 +106,32 @@ python3 -m http.server 8080
 - 测试：data 9/9 通过，streak 6/6 通过
 - 文件：index.html, css/main.css, js/app.js, js/share.js, js/data.js, js/sound.js, tests/*.test.js
 
+---
+
+## 2026-04-27
+
+### 今日完成 — v4 部署上线
+- [x] 设计文档 — GitHub Pages 用户站点部署方案
+  - 文件：`docs/superpowers/specs/2026-04-27-deployment-design.md`
+- [x] 实现计划 — 6 个任务
+  - 文件：`docs/superpowers/plans/2026-04-27-deployment.md`
+- [x] 文件清理 — 删除 21 张开发截图、.DS_Store、.playwright-mcp/、未用原始素材
+- [x] .gitignore 更新 — `/*.png` 仅忽略根目录，不影响 assets/
+- [x] 分支重命名 — `master` → `main`
+- [x] 推送至 GitHub — `git push -u origin main` 到 `yfwangning/yfwangning.github.io`
+- [x] 部署验证 — 全部通过
+  - 首页加载：语录、粒子动画、剪影正常
+  - 解析屏：释义、历史背景、今日启示正常
+  - 打卡功能：按钮状态变化正常
+  - 分享卡片：预览模态框、图片生成正常
+  - 移动端：iPhone 14 Pro Max 模拟器布局正常
+
+### 项目状态
+- 当前版本：v4（已部署上线）
+- 线上地址：https://yfwangning.github.io/
+- 分支：main
+- 测试：data 9/9 通过，streak 6/6 通过
+- 文件：index.html, css/main.css, js/app.js, js/share.js, js/data.js, js/sound.js, tests/*.test.js
+
 ### 下一步可选
-- [ ] 部署上线（GitHub Pages / Vercel）
 - [ ] 语录数据审查（用户抽查和修正个别出处）
